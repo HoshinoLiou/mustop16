@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MUSTOP16</title>
+
+    <!-- google-icon -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+    <!-- axios cdn -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+    <!-- awesomefont -->
+    <link rel="stylesheet" href="fontawesome/css/all.min.css">
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Righteous&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap');
+
+        .material-icons {
+            font-family: 'Material Icons';
+            font-weight: normal;
+            font-style: normal;
+            font-size: 24px;
+            /* Preferred icon size */
+            display: inline-block;
+            line-height: 1;
+            text-transform: none;
+            letter-spacing: normal;
+            word-wrap: normal;
+            white-space: nowrap;
+            direction: ltr;
+
+            /* Support for all WebKit browsers. */
+            -webkit-font-smoothing: antialiased;
+            /* Support for Safari and Chrome. */
+            text-rendering: optimizeLegibility;
+            /* Support for Firefox. */
+            -moz-osx-font-smoothing: grayscale;
+            /* Support for IE. */
+            font-feature-settings: 'liga';
+        }
+
+
+        * {
+            margin: 0;
+            padding: 0;
+            font-family: 'Noto Sans TC', sans-serif;
+        }
+
+        :root {
+            --bgColor: black;
+            --eleColor: rgb(70, 70, 70);
+            --fColor: white;
+            --fColor2: rgb(172, 172, 172);
+        }
+
+
+
+        #app {
+            overflow-x: hidden;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        #musicChoiceHeader {
+            position: fixed;
+            top: 50%;
+            left: 0;
+            width: 50px;
+            height: 5px;
+            background: red;
+        }
+
+        .chartList {
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: flex-start;
+            position: fixed;
+            right: 0;
+            width: 0%;
+            height: 100vh;
+            background: rgba(255, 255, 255, 0.9);
+            color: black;
+            transition: 0.3s;
+            z-index: 3;
+            overflow-y: scroll;
+        }
+
+        .chartList .logo {
+            padding: 30px 15px;
+        }
+
+        .chartList.show {
+            width: 200px;
+        }
+
+        .chartList_title {}
+
+        .chartList .chartList_choice {
+            display: none;
+        }
+
+        .chartList .chartList_item {
+            width: 100%;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+
+        .chartList .chartList_choice:checked+.chartList_item {
+            display: none;
+        }
+
+
+        /*-----------------------------------*/
+
+        /* 至下 */
+        .musicList {
+            display: flex;
+            justify-content: flex-start;
+            align-items: flex-end;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            /* height: 80%; */
+            height: 80%;
+            overflow-x: scroll;
+        }
+
+
+        /* 至下 */
+        .musicList_inner {
+            display: flex;
+            flex-direction: row;
+            justify-content: flex-start;
+            align-items: flex-end;
+            height: 100%;
+            box-sizing: border-box;
+        }
+
+
+        .musicList .musicChoice {
+            display: none;
+        }
+
+        .musicList .musicChoice:checked+.musicList_item {
+            transform: scale(1.2);
+            opacity: 1;
+        }
+
+        /* 至左 */
+        /* .musicList .musicList_item {
+            flex-shrink: 0;
+            width: 100%;
+            height: 20%;
+            box-sizing: border-box;
+            flex-shrink: 0;
+            transform: scale(0.7);
+            transition: 0.5s;
+        } */
+
+        /* 至下 */
+        .musicList .musicList_item {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            align-items: flex-start;
+            flex-shrink: 0;
+            width: 23%;
+            /* height: 100%; */
+            box-sizing: border-box;
+            flex-shrink: 0;
+            transition: 0.5s;
+            transform-origin: bottom;
+            padding: 0 5px 20px;
+            transform: scale(0.9);
+            opacity: 0.5;
+        }
+
+        .musicList_item .item_content {}
+
+        .musicList_item p {
+            font-size: 12px;
+        }
+
+
+        .item_img {
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            overflow: hidden;
+            width: 100%;
+            height: 100%;
+            /* display: none; */
+        }
+
+        /* 至左 */
+        /* .item_img img {
+            height: 100%;
+        } */
+
+        /* 至下 */
+        .item_img img {
+            width: 100%;
+        }
+
+        /*--------------------------------*/
+
+        .title {
+            margin: 0px 0 20px;
+        }
+
+        /*--------------------------------*/
+
+        .showMusicData {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            /* height: calc(100vh - 280px); */
+            height: 55%;
+            margin-top: 0vh;
+            /* width: 100vw; */
+            width: 100%;
+            padding: 0 30px;
+            box-sizing: border-box;
+            line-height: 1.1;
+        }
+
+        .showMusicData .showMusicData_title {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 32%;
+        }
+
+        .showMusicData .showMusicData_title p {
+            font-size: 12px;
+            margin-bottom: 7px;
+        }
+
+        .showMusicData .showMusicData_title h3 {
+            font-size: 20px;
+            letter-spacing: 7px;
+        }
+
+        .showMusicData_img {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            /* height: 200px; */
+            /* height: 10%; */
+            height: 53%;
+            border-radius: 3px;
+            box-shadow: -5px 8px 17px -3px rgb(0 0 0 / 60%);
+            transition: 0.5s;
+        }
+
+        .showMusicData_img_inner {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            transition: 0.7s;
+            height: 100%;
+            width: 100%;
+        }
+
+        .showMusicData_img.ani {
+            border-radius: 50%;
+        }
+
+        .showMusicData_img_inner.ani {
+            position: relative;
+            border: 5px solid white;
+            border-radius: 50%;
+            overflow: hidden;
+            height: 95%;
+            width: 95%;
+            animation-name: cdAnimation;
+            animation-duration: 5s;
+            animation-delay: 1s;
+            animation-iteration-count: infinite;
+            animation-timing-function: linear;
+        }
+
+        .showMusicData_img_inner.ani::before {
+            position: absolute;
+            content: "";
+            height: 17px;
+            width: 17px;
+            background: rgb(180, 180, 180);
+            border: 3px solid rgba(255, 255, 255, 0.6);
+            border-radius: 50%;
+        }
+
+        .showMusicData_img.ani::after {
+            position: absolute;
+            content: "==";
+            font-size: 600;
+            color: black;
+            top: 0;
+            right: 0;
+            height: 3px;
+            width: 40%;
+            background: white;
+            transform: rotate(-45deg);
+            transform-origin: right;
+            z-index: 1;
+            border-radius: 5px;
+            animation-name: rotateAnimation;
+            animation-duration: 1s;
+            animation-delay: 1s;
+            animation-iteration-count: infinite;
+            animation-timing-function: linear;
+            border: 1px solid black;
+        }
+
+        .showMusicData_img.ani::before {
+            position: absolute;
+            content: "";
+            top: -5px;
+            right: -3px;
+            height: 10px;
+            width: 10px;
+            /* background: rgb(255, 102, 102); */
+            background: #09c8ee;
+            border-radius: 50%;
+            z-index: 2;
+            animation-name: rotateAnimation;
+            animation-duration: 1s;
+            animation-delay: 1s;
+            animation-iteration-count: infinite;
+            animation-timing-function: linear;
+            border: 1px solid black;
+        }
+
+        @keyframes cdAnimation {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            25% {
+                transform: rotate(90deg);
+            }
+
+            50% {
+                transform: rotate(180deg);
+            }
+
+            75% {
+                transform: rotate(270deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes rotateAnimation {
+            0% {
+                transform: rotate(-45deg);
+            }
+
+            25% {
+                transform: rotate(-43deg);
+            }
+
+            50% {
+                transform: rotate(-47deg);
+            }
+
+            75% {
+                transform: rotate(-44deg);
+            }
+
+            100% {
+                transform: rotate(-46deg);
+            }
+        }
+
+        .showMusicData_img img {
+            width: 100%;
+        }
+
+        .showMusicData_content {
+            margin-top: 25px;
+            max-width: 250px;
+            height: 20%;
+            /* padding: 0 45px; */
+        }
+
+        .showMusicData_content .inf {
+            height: 60%;
+        }
+
+        .showMusicData_content .inf p {
+            font-size: 12px;
+            margin-top: 12px;
+            color: #9e9e9e;
+            transform: translateY(0%);
+            transition: 0.5s;
+        }
+
+        .showMusicData_content .inf h1 {
+            font-size: 16px;
+            font-weight: normal;
+            transform: translateY(0%);
+            transition: 0.5s;
+        }
+
+        .control {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 30px;
+            z-index: 2;
+            height: 40%;
+        }
+
+        .control div,
+        .control a {
+            background: none;
+            border: none;
+            color: #09c8ee;
+            margin: 0 10px;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 14px;
+            text-decoration: none;
+            box-sizing: border-box;
+        }
+
+        .control span {
+            margin-left: 5px;
+        }
+
+        .control .kkboxPlay {
+            background: #09c8ee;
+            color: var(--fColor);
+            border-radius: 3px;
+        }
+
+        .control .youtubePlay {
+            background: #f70000;
+            color: var(--fColor);
+            border-radius: 3px;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            /* height: 75px; */
+            height: 10%;
+            /* width: 100vw; */
+            width: 100%;
+            padding: 0 30px;
+            margin-bottom: 10px;
+            box-sizing: border-box;
+        }
+
+        header div {
+            width: 30%;
+        }
+
+        .logo {
+            font-family: 'Righteous', cursive;
+            font-size: 23px;
+            text-transform: uppercase;
+            color: #09c8ee;
+            font-weight: 600;
+        }
+
+        .title {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+        }
+
+
+
+        .title p {
+            font-size: 12px;
+        }
+
+        .title h3 {
+            font-size: 20px;
+            letter-spacing: 7px;
+        }
+
+        #burger {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+        }
+
+        /*----------------------------*/
+
+        #bg {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: fixed;
+            z-index: -1;
+            height: 100vh;
+            width: 100vw;
+            opacity: 1;
+            transition: 0.3s;
+        }
+
+        #bg.hide {
+            opacity: 0;
+            transition: 0.3s;
+        }
+
+        #bg .mask {
+            position: fixed;
+            height: 100vh;
+            width: 100vw;
+            background: white;
+            opacity: 0.5;
+            z-index: 1;
+        }
+
+        #bg img {
+            width: 100%;
+            height: auto;
+            filter: opacity(.4);
+        }
+
+        @media (orientation: portrait) {
+            #bg img {
+                height: 100%;
+                width: auto;
+                filter: opacity(.4);
+            }
+        }
+
+        .aniDown {
+            transform: translateY(-100%);
+            transition: 0.5s;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="app">
+        <!-- 排行榜表單 -->
+        <div class="chartList">
+            <div class="logo">
+                MUSTOP16
+            </div>
+            <template v-for="chart in chartPlaylists">
+                <input type="radio" name="chartList_choice" class="chartList_choice" v-bind:id="chart.id"
+                    v-bind:value="chart.id" v-model="nowChoiceChart">
+                <label class="chartList_item" v-bind:for="chart.id" v-on:click="hideMenu()">
+                    {{chart.title}}
+                </label>
+            </template>
+        </div>
+
+        <!-- {{nowChoiceChart}}-->
+
+        <div id="bg">
+            <div class="mask"></div>
+            <img v-bind:src="music_inf.album.artist.images[1].url" alt="">
+            <!-- <img v-bind:src="music_inf.album.images[2].url" alt=""> -->
+        </div>
+
+        <header>
+            <!-- logo -->
+            <div class="logo">
+                <!-- <img src="kkbox-rebrand-blue.svg" alt=""> -->
+                MUSTOP16
+            </div>
+            <!-- 標頭 -->
+            <!-- <div class="title">
+                <p>{{chartPlaylists_object[nowChoiceChart]}}</p>
+                <h3>第{{this.nowchoice_music*1+1}}名</h3>
+            </div> -->
+            <!-- 漢堡選單 -->
+            <div id="burger" v-on:click="showMenu()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" fill="currentColor"
+                    class="bi bi-list" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd"
+                        d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5z" />
+                </svg>
+            </div>
+        </header>
+
+
+        <!-- 撥放器 -->
+        <div class="showMusicData" v-on:click="hideMenu()">
+            <div class="showMusicData_title" v-on:click="hideMenu()">
+                <p>{{chartPlaylists_object[nowChoiceChart]}}</p>
+                <h3>第{{this.nowchoice_music*1+1}}名</h3>
+            </div>
+            <div id="showMusicData_img" v-bind:class="{ showMusicData_img: true, ani: playing }">
+                <div v-bind:class="{ showMusicData_img_inner: true, ani: playing }">
+                    <img v-bind:src="music_inf.album.images[2].url" alt="">
+                </div>
+            </div>
+            <div class="showMusicData_content">
+                <div class="inf">
+                    <h1>{{music_inf.name}}</h1>
+                    <p>{{music_inf.album.artist.name}}</p>
+                    <!-- <p>{{music_inf.youtubeID}}</p> -->
+                </div>
+                <div class="control">
+                    <div v-if="!playing" class="kkboxPlay" v-on:click="playMusic(music_inf.id)">
+                        <i class="fas fa-play"></i> <span>試聽</span>
+                    </div>
+                    <div v-else class="kkboxPlay" v-on:click="stopMusic()">
+                        <i class="fas fa-stop"></i> <span>停止</span>
+                    </div>
+                    <a class="youtubePlay" target="_blank"
+                        v-bind:href="'http://www.youtube.com/results?search_query='+ music_inf.name +' '+music_inf.album.artist.name">
+                        <i class="fab fa-youtube"></i> <span>Youtube</span>
+                    </a>
+                </div>
+                <div class="kkboxPlayer"></div>
+            </div>
+        </div>
+
+        <!-- 歌曲表單 -->
+        <div class="musicList" v-on:click="hideMenu()">
+            <div class="musicList_inner">
+                <template v-for="(list,index) in ListOfChart">
+                    <input v-bind:value="index" v-bind:id="list.id" type="radio" class="musicChoice" name="musicChoice"
+                        v-model="nowchoice_music">
+                    <label v-bind:for="list.id" class="musicList_item">
+                        <div class="item_img">
+                            <!-- 專輯圖片: -->
+                            <img v-bind:src="list.album.images[1].url" alt="">
+                        </div>
+                        <div class="item_content">
+                            <!-- 專輯名: -->
+                            <!-- <h5>{{list.album.name}}</h5> -->
+                            <!-- 歌名: -->
+                            <!-- <p>{{list.name}}</p> -->
+                            <!-- 創作者名: -->
+                            <!-- <p>{{list.album.artist.name}}</p> -->
+                            <!-- 創作者圖片: -->
+                            <!-- <img v-bind:src="list.album.artist.images[1].url" alt=""> -->
+                        </div>
+                    </label>
+                </template>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Vue 3.0 cdn -->
+    <script src="https://unpkg.com/vue@next"></script>
+
+    <script>
+        function _0x57e8(_0x5daa43,_0x3a890f){const _0x2f5e89=_0x2f5e();return _0x57e8=function(_0x57e82e,_0x6661e6){_0x57e82e=_0x57e82e-0x18d;let _0x39a57c=_0x2f5e89[_0x57e82e];return _0x39a57c;},_0x57e8(_0x5daa43,_0x3a890f);}const _0x2d75e1=_0x57e8;(function(_0x21811c,_0x1d5f03){const _0x40f8f0=_0x57e8,_0xb1e5cf=_0x21811c();while(!![]){try{const _0x1dc167=parseInt(_0x40f8f0(0x1d5))/0x1*(parseInt(_0x40f8f0(0x1ad))/0x2)+parseInt(_0x40f8f0(0x1a3))/0x3+-parseInt(_0x40f8f0(0x1b0))/0x4+-parseInt(_0x40f8f0(0x195))/0x5+parseInt(_0x40f8f0(0x18d))/0x6*(parseInt(_0x40f8f0(0x1cb))/0x7)+-parseInt(_0x40f8f0(0x1d2))/0x8*(-parseInt(_0x40f8f0(0x19a))/0x9)+parseInt(_0x40f8f0(0x1c2))/0xa;if(_0x1dc167===_0x1d5f03)break;else _0xb1e5cf['push'](_0xb1e5cf['shift']());}catch(_0x2e7a30){_0xb1e5cf['push'](_0xb1e5cf['shift']());}}}(_0x2f5e,0x646d0));let vm=Vue['createApp']({'data'(){const _0x20a191=_0x57e8;return{'apiUrl':_0x20a191(0x1c6),'language':'TW','token':_0x20a191(0x1d9),'chartPlaylists':{},'nowChoiceChart':'','chartPlaylists_object':{},'ListOfChart':{},'nowchoice_music':'','music_inf':{},'playing':![]};},'watch':{'nowChoiceChart':async function(){const _0x5d1a6a=_0x57e8;this['ListOfChart']=await this[_0x5d1a6a(0x19e)](this[_0x5d1a6a(0x1c4)]),this[_0x5d1a6a(0x1a5)](),this['music_inf']=this['ListOfChart'][0x0],this[_0x5d1a6a(0x1b3)]();let _0x31e4ed=document['getElementsByClassName'](_0x5d1a6a(0x1c3))[0x0];_0x31e4ed[_0x5d1a6a(0x1ba)](0x0,0x0);},'nowchoice_music':async function(){const _0x440827=_0x57e8;this[_0x440827(0x1a5)](),this[_0x440827(0x1c8)]=this[_0x440827(0x1a0)][this['nowchoice_music']],this['stopMusic']();}},'computed':{},'methods':{'getChartPlaylists':function(){const _0x375ae1=_0x57e8,_0x4881a9={'url':this[_0x375ae1(0x1a8)]+_0x375ae1(0x1ce)+this[_0x375ae1(0x18f)],'method':_0x375ae1(0x1ca),'headers':{'accept':_0x375ae1(0x1a1),'authorization':_0x375ae1(0x19b)+this[_0x375ae1(0x1be)]}};return axios(_0x4881a9)[_0x375ae1(0x1b2)](_0x220aa7=>{const _0x481538=_0x375ae1;return _0x220aa7[_0x481538(0x1db)][_0x481538(0x1db)];})['catch'](_0x3585ea=>{return console['log'](_0x3585ea),_0x3585ea;});},'getListOfChart':function(_0x55c73c){const _0x3ed015=_0x57e8;let _0x39fd60=0x10;const _0x23c5ce={'url':this[_0x3ed015(0x1a8)]+'/v1.1/charts/'+_0x55c73c+'/tracks?territory='+this['language']+'&limit='+_0x39fd60,'method':_0x3ed015(0x1ca),'headers':{'accept':_0x3ed015(0x1a1),'authorization':_0x3ed015(0x19b)+this[_0x3ed015(0x1be)]}};return axios(_0x23c5ce)['then'](_0x29aca4=>{const _0x457325=_0x3ed015;return _0x29aca4[_0x457325(0x1db)][_0x457325(0x1db)];})[_0x3ed015(0x1bb)](_0x3cf02e=>{return console['log'](_0x3cf02e),_0x3cf02e;});},'getTrackData':function(_0x5792a0){const _0x2b1e92=_0x57e8,_0x526073={'url':this[_0x2b1e92(0x1a8)]+_0x2b1e92(0x1cc)+_0x5792a0+_0x2b1e92(0x1c9)+this[_0x2b1e92(0x18f)],'method':_0x2b1e92(0x1ca),'headers':{'accept':'application/json','authorization':_0x2b1e92(0x19b)+this[_0x2b1e92(0x1be)]}};return axios(_0x526073)[_0x2b1e92(0x1b2)](_0x5ba9e4=>{const _0x5a9c73=_0x2b1e92;return console[_0x5a9c73(0x1c1)](_0x5ba9e4[_0x5a9c73(0x1db)]),_0x5ba9e4[_0x5a9c73(0x1db)];})[_0x2b1e92(0x1bb)](_0x586d40=>{return console['log'](_0x586d40),_0x586d40;});},'getHMS':function(_0x1136f3){const _0x9e46c4=_0x57e8;let _0x51d30e=this[_0x9e46c4(0x19d)](_0x1136f3%0x3c),_0x1f079e=this[_0x9e46c4(0x19d)](Math[_0x9e46c4(0x1b8)](_0x1136f3/0x3c)%0x3c),_0xdf370c=this[_0x9e46c4(0x19d)](Math[_0x9e46c4(0x1b8)](_0x1136f3/0xe10)%0x3c);return _0xdf370c+':'+_0x1f079e+':'+_0x51d30e;},'addz':function(_0xb81057){return _0xb81057<0xa?'0'+_0xb81057:_0xb81057;},'showMenu':function(){const _0x3ea6f3=_0x57e8;let _0x284cbb=document['getElementsByClassName']('chartList')[0x0];_0x284cbb[_0x3ea6f3(0x19c)][_0x3ea6f3(0x1d3)](_0x3ea6f3(0x1d4));},'hideMenu':function(){const _0x5a9bf2=_0x57e8;let _0x537f48=document[_0x5a9bf2(0x1dc)](_0x5a9bf2(0x1b9))[0x0];_0x537f48['classList'][_0x5a9bf2(0x18e)]('show');},'bgAnimation':function(){const _0x32472f=_0x57e8;let _0x345daf=document[_0x32472f(0x1da)]('bg');_0x345daf[_0x32472f(0x19c)][_0x32472f(0x1d3)](_0x32472f(0x1a9)),setTimeout(()=>{const _0x2e8aa3=_0x32472f;_0x345daf[_0x2e8aa3(0x19c)][_0x2e8aa3(0x18e)]('hide');},0x1f4);},'playMusic':function(_0x1c4d7d){const _0x526ed2=_0x57e8;let _0x1bc3b2=document['createElement'](_0x526ed2(0x1aa));_0x1bc3b2[_0x526ed2(0x1b1)]=_0x526ed2(0x1a4),_0x1bc3b2[_0x526ed2(0x1a6)]=_0x526ed2(0x1c0)+_0x1c4d7d+_0x526ed2(0x1ae),_0x1bc3b2[_0x526ed2(0x1bd)]=_0x526ed2(0x190),_0x1bc3b2[_0x526ed2(0x1d7)][_0x526ed2(0x192)]=_0x526ed2(0x19f);let _0x1c6b3e=document[_0x526ed2(0x1dc)](_0x526ed2(0x1d1))[0x0];_0x1c6b3e[_0x526ed2(0x1d8)](_0x1bc3b2),this[_0x526ed2(0x1bf)]=!![];},'stopMusic':function(){const _0x5055d7=_0x57e8;let _0x44eb5e=document['getElementsByClassName'](_0x5055d7(0x1d1))[0x0];_0x44eb5e[_0x5055d7(0x198)]='',this[_0x5055d7(0x1bf)]=![];}},'beforeCreate'(){},async 'created'(){const _0x1ab74f=_0x57e8;this[_0x1ab74f(0x196)]=await this[_0x1ab74f(0x1b7)](),this[_0x1ab74f(0x1c4)]=this[_0x1ab74f(0x196)][0x0]['id'];for(let _0x470514=0x0;_0x470514<this[_0x1ab74f(0x196)][_0x1ab74f(0x193)];_0x470514++){this[_0x1ab74f(0x1b5)][this[_0x1ab74f(0x196)][_0x470514]['id']]=this[_0x1ab74f(0x196)][_0x470514]['title'];}this[_0x1ab74f(0x1a0)]=await this[_0x1ab74f(0x19e)](this[_0x1ab74f(0x1c4)]),this[_0x1ab74f(0x1d0)]=0x0,this[_0x1ab74f(0x1c8)]=this[_0x1ab74f(0x1a0)][this[_0x1ab74f(0x1d0)]];},'beforeMount'(){},async 'mounted'(){const _0x2889a6=_0x57e8;let _0x1a82f3=document['getElementsByClassName']('musicList')[0x0],_0xd80690=document['getElementsByClassName'](_0x2889a6(0x1cf))[0x0],_0x98be88=document[_0x2889a6(0x1dc)](_0x2889a6(0x1bc)),_0x54c95c=document[_0x2889a6(0x1dc)](_0x2889a6(0x1b6)),_0x43369d='';_0x1a82f3[_0x2889a6(0x1ab)](_0x2889a6(0x1d6),_0x2f71be=>{const _0x1f0dce=_0x2889a6;_0x2f71be['preventDefault'](),_0x1a82f3[_0x1f0dce(0x1ac)]+=_0x2f71be[_0x1f0dce(0x199)];}),_0x1a82f3['addEventListener'](_0x2889a6(0x191),_0x2d6802=>{const _0x37a96c=_0x2889a6;let _0x36d1b9=_0x2d6802[_0x37a96c(0x1c7)]['scrollWidth']-_0x2d6802[_0x37a96c(0x1c7)][_0x37a96c(0x194)],_0x269d4b=_0x36d1b9/_0x98be88[_0x37a96c(0x193)],_0xc65ada=Math[_0x37a96c(0x1af)](_0x2d6802[_0x37a96c(0x1c7)][_0x37a96c(0x1ac)]/_0x269d4b);_0x54c95c[_0xc65ada][_0x37a96c(0x197)]=!![],this[_0x37a96c(0x1d0)]=_0x54c95c[_0xc65ada][_0x37a96c(0x1b4)];});let _0x16dfe8=document[_0x2889a6(0x1da)]('showMusicData_img');_0x16dfe8[_0x2889a6(0x1d7)][_0x2889a6(0x1c5)]=_0x16dfe8[_0x2889a6(0x1a2)]+'px';}});function _0x2f5e(){const _0x385c55=['347426mAFnqA','&type=song&terr=SG&lang=en&autoplay=true&loop=true','round','861040SxHjfa','height','then','stopMusic','value','chartPlaylists_object','musicChoice','getChartPlaylists','floor','chartList','scrollTo','catch','musicList_item','allow','token','playing','https://widget.kkbox.com/v1/?id=','log','660530mXOevB','musicList','nowChoiceChart','width','https://api.kkbox.com','target','music_inf','?territory=','GET','63UqgXQJ','/v1.1/tracks/','#app','/v1.1/charts?territory=','musicList_inner','nowchoice_music','kkboxPlayer','16GvkDgR','add','show','1FhPSTi','wheel','style','appendChild','ONF9t-gd1P2Vby0Jn6ezHA==','getElementById','data','getElementsByClassName','161286kbZlXq','remove','language','autoplay','scroll','display','length','clientWidth','3058985evxBCy','chartPlaylists','checked','innerHTML','deltaY','1728207rFlbVF','Bearer\x20','classList','addz','getListOfChart','none','ListOfChart','application/json','offsetHeight','1117980FYvLqa','100px','bgAnimation','src','mount','apiUrl','hide','iframe','addEventListener','scrollLeft'];_0x2f5e=function(){return _0x385c55;};return _0x2f5e();}vm[_0x2d75e1(0x1a7)](_0x2d75e1(0x1cd));
+    </script>
+</body>
+
+</html>
